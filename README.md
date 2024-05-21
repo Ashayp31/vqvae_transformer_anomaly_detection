@@ -83,7 +83,7 @@ python3 run_vqvae.py run \
 The VQVAE training code is DistributedDataParallel (DDP) compatible. For example to train with 4 GPUs run with:
 ```bash
 mpirun -np 4 --oversubscribe --allow-run-as-root python3 run_vqvae.py run
-'''
+```
 
 
 
