@@ -87,46 +87,6 @@ class RandResizeImg(MapTransform):
         return d
     
 
-class CheckDimensions(MapTransform):
-    def __init__(
-        self,
-        keys: KeysCollection,
-        allow_missing_keys: bool = False,
-
-    ) -> None:
-        super().__init__(keys, allow_missing_keys)
-
-    def __call__(self, data):
-        d = dict(data)
-
-        image_data = d["MRI"]
-        x_len = image_data.shape[1]
-        y_len = image_data.shape[2]
-        z_len = image_data.shape[3]
-        x_rem = 16-(x_len % 16) if ((x_len % 16) != 0) else 0
-        y_rem = 16-(y_len % 16) if ((y_len % 16) != 0) else 0
-        z_rem = 16-(z_len % 16) if ((z_len % 16) != 0) else 0
-
-        x_pad_before = x_rem // 2
-        x_pad_after = x_rem - x_pad_before
-
-        y_pad_before = y_rem // 2
-        y_pad_after = y_rem - y_pad_before
-
-        z_pad_before = z_rem // 2
-        z_pad_after = z_rem - z_pad_before
-
-        if x_rem !=0 or y_rem != 0 or z_rem != 0:
-            new_img = np.pad(image_data, ((0,0),(x_pad_before, x_pad_after),(y_pad_before, y_pad_after),(z_pad_before, z_pad_after)), 'constant', constant_values=0)
-        else:
-            new_img = image_data
-
-
-        d["MRI"] = new_img
-
-        return d
-
-
 class RotateImages(MapTransform):
     def __init__(
         self,
@@ -435,7 +395,7 @@ def get_transformations(
             else:
                 augmentations += [Rand3DElasticd(
                     keys=[key],
-                    prob=0.5, #0.8,
+                    prob=0.8,
                     sigma_range=[1.0, 2.0],
                     magnitude_range=[2.0, 5.0],
                     rotate_range=[0, 0, 0.0],
@@ -481,11 +441,8 @@ def get_transformations(
         if apply_coordConv and not input_has_coordConv:
             transform += [AddCordConv(keys=[key])]
 
-        # transform += [RandResizeImg(keys=[key])]
+        transform += [RandResizeImg(keys=[key])]
 
-        # transform += [CheckDimensions(keys=[key])]
-
-        # transform += [SignalFillEmptyd(keys=[key])]
 
         if apply_coordConv:
             transform += [ToTensord(keys=[key, "crop"])]
