@@ -10,7 +10,7 @@
 
 
 ## Intro
-This codebase contains code for training a VQ-VAE or VQ-GAN model coupled with a performer (linear approximation to full attention in a Transformer) for generative modelling and anomaly detection.
+This codebase contains code for training a VQ-VAE or VQ-GAN model and transformer for generative modelling and anomaly detection.
 It is the base framework for the work published in [1].
 It also contains the extended scripts the continue the work in [1] for the applications in the work published in [2] and [3].
 
