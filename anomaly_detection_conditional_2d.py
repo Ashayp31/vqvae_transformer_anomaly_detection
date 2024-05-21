@@ -272,16 +272,7 @@ def inference(config: dict):
             name_addition = "combined_th_" + str(config["threshold"]).replace(".", "_") + "_npd_" + \
                                 str(config["num_passes_dropout"]) + "_nps_" + str(
                     config["num_passes_sampling"]) + condition_add_name
-            # SegmentationSaver(
-            #     output_dir=config["outputs_directory"],
-            #     output_postfix=name_addition + "_result",
-            #     output_ext=".nii.gz",
-            #     resample=False,
-            #     scale=None,
-            #     dtype=np.dtype(np.float32),
-            #     batch_transform=lambda batch: batch["quantization_meta_dict"],
-            #     output_transform=lambda output: output[CommonKeys.PRED]["kde_result"],
-            # ).attach(engine)
+           
             NpySaver(
                 output_dir=config["outputs_directory"],
                 output_postfix=name_addition + "_recons",
@@ -310,68 +301,6 @@ def inference(config: dict):
                 batch_transform=lambda batch: batch["quantization_meta_dict"],
                 output_transform=lambda output: output[CommonKeys.PRED]["resampling_mask"],
             ).attach(engine)
-            #SegmentationSaver(
-            #    output_dir=config["outputs_directory"],
-            #    output_postfix=name_addition + "_recons",
-            #    output_ext=".nii.gz",
-            #    resample=False,
-            #    scale=None,
-            #    dtype=np.dtype(np.float32),
-                #batch_transform= lambda batch: {'filename_or_obj':  batch["quantization_meta_dict"]["filename_or_obj"]},
-            #    batch_transform=get_batch_transform(
-            #    no_augmented_extractions=0,
-            #    is_nii_based=True,
-            #    filename_or_objs_only=True,
-            #    mode="extracting"),
-            #    output_transform=lambda output: output[CommonKeys.PRED]["reconstructions"],
-            #).attach(engine)
-            #SegmentationSaver(
-            #    output_dir=config["outputs_directory"],
-            #    output_postfix=name_addition + "_mean",
-            #    output_ext=".nii.gz",
-            #    resample=False,
-            #    scale=None,
-            #    dtype=np.dtype(np.float32),
-                #batch_transform= lambda batch: {'filename_or_obj':  batch["quantization_meta_dict"]["filename_or_obj"]},
-            #    batch_transform=get_batch_transform(
-            #    no_augmented_extractions=0,
-            #    is_nii_based=True,
-            #    filename_or_objs_only=True,
-            #    mode="extracting"),
-            #    output_transform=lambda output: output[CommonKeys.PRED]["mean"],
-            #).attach(engine)
-            #SegmentationSaver(
-            #    output_dir=config["outputs_directory"],
-            #    output_postfix=name_addition + "_std",
-            #    output_ext=".nii.gz",
-            #    resample=False,
-            #    scale=None,
-            #    dtype=np.dtype(np.float32),
-                #batch_transform= lambda batch:{'filename_or_obj':  batch["quantization_meta_dict"]["filename_or_obj"]},
-            #    batch_transform=get_batch_transform(
-            #    no_augmented_extractions=0,
-            #    is_nii_based=True,
-            #    filename_or_objs_only=True,
-            #    mode="extracting"),
-            #    output_transform=lambda output: output[CommonKeys.PRED]["std"],
-            #).attach(engine)
-            #SegmentationSaver(
-            #    output_dir=config["outputs_directory"],
-            #    output_postfix=name_addition + "_resampling_mask",
-            #    output_ext=".nii.gz",
-            #    resample=False,
-            #    scale=None,
-            #    dtype=np.dtype(np.float32),
-                #batch_transform= lambda batch: {'filename_or_obj':  batch["quantization_meta_dict"]["filename_or_obj"]},
-            #    batch_transform=get_batch_transform(
-            #    no_augmented_extractions=0,
-            #    is_nii_based=True,
-            #    filename_or_objs_only=True,
-            #    mode="extracting"),
-            #    output_transform=lambda output: output[CommonKeys.PRED]["resampling_mask"],
-            #).attach(engine)
-    
-    
     
         ProgressBar().attach(engine, output_transform=lambda output: {"Loss": 0})
     
