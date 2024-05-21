@@ -311,11 +311,11 @@ def run(
         # File system parameters
         training_subjects: Union[
             str, Tuple[str, ...]
-        ] = "/home/danieltudosiu/storage/datasets/neuro_morphology/healthy/nii_training/",
+        ] = "/project/data/nii_training/",
         validation_subjects: Union[
             str, Tuple[str, ...]
-        ] = "/home/danieltudosiu/storage/datasets/neuro_morphology/healthy/nii_validation/",
-        project_directory: str = "/home/danieltudosiu/storage/projects/nmcgm/",
+        ] = "/project/data/",
+        project_directory: str = "/project_name/",
         experiment_name: str = "nvidia",
         transformer_network_checkpoint: str = "/nfs/home/apatel/CT_PET_FDG/results/vqgan_suv_15_jp_do_005_wn_none_dropout_end_ne64_PET_6/enc_dec_performer/checkpoints/checkpoint_epoch=200.pt",
         vqvae_network_checkpoint: str = "/nfs/home/apatel/CT_PET_FDG/private_NSCLC_results/vqgan_suv_15_jp_do_005_dropout_end_ne64_PET/baseline_vqvae/checkpoints/checkpoint_epoch=1500.pt",
