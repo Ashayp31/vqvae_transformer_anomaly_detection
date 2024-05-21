@@ -10,14 +10,10 @@
 
 
 ## Intro
-This codebase contains code for performing generative modelling of 3D medical imaging with diffusion models in addition to super-resolution tasks. It supports the use of DDPMs in addition to LDMs for higher dimensional data.
-This work is the official implementation of [1] applied to 3D CT data. 
-This codebase contains the code to perform unsupervised out-of-distribution detection with diffusion models.
-It supports the use of DDPMs as well as Latent Diffusion Models (LDM) for dealing with higher dimensional data.
-It is based on work published in [1] and [2].
+This codebase contains code for training a VQ-VAE or VQ-GAN model coupled with a performer (linear approximation to full attention in a Transformer) for generative modelling and anomaly detection.
+It is based on work published in [1].
 
-[1] [Resolution and Field of View Invariant Generative Modelling with Latent Diffusion Models]([https://arxiv.org/abs/2211.07740](https://openreview.net/pdf?id=VHfh2J8MQ6))
-
+[1] [Cross Attention Transformers for Multi-modal Unsupervised Whole-Body PET Anomaly Detection]([https://arxiv.org/abs/2304.07147])
 ## Setup
 
 ### Install
@@ -32,15 +28,13 @@ bash create_docker_image.sh
 ```
 
 
-## Run with LDM
-
 ### Train VQVAE
 ```bash
 python3 run_vqvae.py run \
     --training_subjects=${path_to_training_subjects} \
     --validation_subjects=${path_to_validation_subjects}  \
     --project_directory=${project_directory_path} \
-    --experiment_name='vqgan_ne512_dim8_CT' \
+    --experiment_name='vqgan_ne256_dim64_PET' \
     --mode='training' \
     --device=0 \
     --amp=True \
