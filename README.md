@@ -4,7 +4,7 @@
 
 
 <p align="center">
-  <img width="800" height="300" src="(https://github.com/Ashayp31/vqvae_transformer_anomaly_detection/assets/62710884/684b0252-dbc5-4a7f-8469-cc3a6501049a">
+  <img width="800" height="300" src="https://github.com/Ashayp31/vqvae_transformer_anomaly_detection/assets/62710884/684b0252-dbc5-4a7f-8469-cc3a6501049a">
 </p>
 
 
