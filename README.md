@@ -11,9 +11,11 @@
 
 ## Intro
 This codebase contains code for training a VQ-VAE or VQ-GAN model coupled with a performer (linear approximation to full attention in a Transformer) for generative modelling and anomaly detection.
-It is based on work published in [1].
+It is based on work published in [1] with further scripts attributed to the work in [2].
 
 [1] [Cross Attention Transformers for Multi-modal Unsupervised Whole-Body PET Anomaly Detection]([https://arxiv.org/abs/2304.07147])
+[2] [Self-Supervised Anomaly Detection from Anomalous Training Data via Iterative Latent Token Masking]([https://openaccess.thecvf.com/content/ICCV2023W/CVAMD/papers/Patel_Self-Supervised_Anomaly_Detection_from_Anomalous_Training_Data_via_Iterative_Latent_ICCVW_2023_paper.pdf])
+
 ## Setup
 
 ### Install
