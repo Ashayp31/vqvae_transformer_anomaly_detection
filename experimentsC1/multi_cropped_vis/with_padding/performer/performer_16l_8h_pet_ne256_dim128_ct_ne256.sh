@@ -1,0 +1,34 @@
+#!/bin/sh
+
+CUDA_LAUNCH_BLOCKING=1 python3 /nfs/home/apatel/vqvae-main/run_transformer.py run \
+    --training_subjects='/nfs/home/apatel/CT_PET_FDG/multi_crop_vis/vqgan_suv_15_jp_do_ne256_dim128_PET/baseline_vqvae/training_codes/' \
+    --validation_subjects='/nfs/home/apatel/CT_PET_FDG/multi_crop_vis/vqgan_suv_15_jp_do_ne256_dim128_PET/baseline_vqvae/validation_codes' \
+    --encoding_conditioning_path='/nfs/home/apatel/Data/combined_datasets/multi_crop_vis/cropped_pet_conditioning_augmented.csv' \
+    --token_masking_path='/nfs/home/apatel/Data/combined_datasets/multi_crop_vis/cropped_pet_conditioning_augmented.csv' \
+    --project_directory='/nfs/home/apatel/CT_PET_FDG/multi_crop_vis/' \
+    --experiment_name='vqgan_suv_15_jp_do_ne256_dim128_PET' \
+    --mode='training' \
+    --deterministic=False \
+    --cuda_benchmark=True \
+    --device=0 \
+    --seed=4 \
+    --epochs=120 \
+    --learning_rate=0.001 \
+    --gamma='auto' \
+    --log_every=1 \
+    --checkpoint_every=1 \
+    --eval_every=5 \
+    --batch_size=1 \
+    --eval_batch_size=1 \
+    --num_workers=8 \
+    --prefetch_factor=8 \
+    --starting_epoch=0 \
+    --network='performer' \
+    --vocab_size_enc=256 \
+    --vocab_size=256 \
+    --n_embd=256 \
+    --n_layers=14 \
+    --n_head=8 \
+    --emb_dropout=0.0 \
+    --ff_dropout=0.0 \
+    --attn_dropout=0.0

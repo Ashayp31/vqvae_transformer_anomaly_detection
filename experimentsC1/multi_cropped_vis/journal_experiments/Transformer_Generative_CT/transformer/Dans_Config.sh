@@ -1,0 +1,98 @@
+#!/bin/bash
+
+runai submit --name full-ukb-t2star-transformer \
+  --image aicregistry:5000/danieltudosiu:vqvae_latest \
+  --backoff-limit 0 \
+  --large-shm \
+  --run-as-user \
+  --host-ipc \
+  --run-as-user \
+  --gpu 1 \
+  --node-type A100 \
+  --project danieltudosiu \
+  -v /nfs/project/danieltudosiu/projects/vqvae:/project \
+  -v /nfs/project/danieltudosiu/results/nmi_rebuttal:/results \
+  -v /nfs/project/AMIGO/Biobank/derivatives/super-res:/data \
+    --command -- python3 /project/run_transformer.py run \
+    --training_subjects='/project/ukb_paths_40k_t2star.tsv' \
+    --validation_subjects='/project/val_paths_40k_t2star.tsv' \
+    --conditionings="(\'25004-2.0\',\'31-0.0\',\'21003-2.0\',\'25009-2.0\')" \
+    --conditioning_path="/project/continuous_conditionings_nii_equalised_t2star.tsv" \
+    --project_directory="/results/" \
+    --experiment_name="x_transformer_1024_36_16_ablation_rpe_rn_ag_srpb_smd_sstr_full_ukb_continous_weighted_dropout_001_equalised_t2star" \
+    --mode="training" \
+    --deterministic=False \
+    --cuda_benchmark=False \
+    --cuda_enable=True \
+    --use_zero=True \
+    --device=0 \
+    --seed=4 \
+    --epochs=500 \
+    --learning_rate=0.0005 \
+    --gamma="auto" \
+    --log_every=1 \
+    --checkpoint_every=1 \
+    --eval_every=0 \
+    --weighted_sampling=False \
+    --batch_size=1 \
+    --eval_batch_size=1 \
+    --num_workers=16 \
+    --prefetch_factor=16 \
+    --vqvae_checkpoint="/results/vq_gan_4_lvls_2048_tokens_32_size_ablation_pfpa_full_ukb_t2star/baseline_vqvae/checkpoints/checkpoint_epoch=37.pt" \
+    --vqvae_aug_conditionings="none" \
+    --vqvae_aug_load_nii_canonical=False \
+    --vqvae_aug_augmentation_probability=0.00 \
+    --vqvae_aug_augmentation_strength=0.0 \
+    --vqvae_aug_normalize=True \
+    --vqvae_aug_standardize=False \
+    --vqvae_aug_roi="((16,176),(16,240),(96,256))" \
+    --vqvae_network="baseline_vqvae" \
+    --vqvae_net_level=0 \
+    --vqvae_net_use_subpixel_conv=False \
+    --vqvae_net_use_slim_residual=True \
+    --vqvae_net_no_levels=4 \
+    --vqvae_net_downsample_parameters="((4,2,1,1),(4,2,1,1),(4,2,1,1),(4,2,1,1))" \
+    --vqvae_net_upsample_parameters="((4,2,1,0,1),(4,2,1,0,1),(4,2,1,0,1),(4,2,1,0,1))" \
+    --vqvae_net_no_res_layers=3 \
+    --vqvae_net_no_channels=256 \
+    --vqvae_net_codebook_type="ema" \
+    --vqvae_net_num_embeddings="(2048,)" \
+    --vqvae_net_embedding_dim="(32,)" \
+    --vqvae_net_embedding_init="(\'normal\',)" \
+    --vqvae_net_commitment_cost="(0.25,)" \
+    --vqvae_net_decay="(0.5,)" \
+    --vqvae_net_dropout=0.0 \
+    --vqvae_net_act="RELU"\
+    --starting_epoch=0 \
+    --ordering_type="raster_scan" \
+    --transpositions_axes="((2,0,1),)" \
+    --rot90_axes="((0,1),)" \
+    --transformation_order="(\'rotate_90\',\'transpose\')" \
+    --network="xtransformer" \
+    --vocab_size=2048 \
+    --n_embd=512 \
+    --n_layers=24 \
+    --n_head=16 \
+    --tie_embedding=False \
+    --ff_glu=False \
+    --emb_dropout=0.001 \
+    --ff_dropout=0.001 \
+    --attn_dropout=0.001 \
+    --use_rezero=False \
+    --position_emb="rotary" \
+    --conditioning_type="cross_attend" \
+    --use_continuous_conditioning="(True,True,True,True)" \
+    --local_attn_heads=8 \
+    --local_window_size=420 \
+    --feature_redraw_interval=1 \
+    --generalized_attention=False \
+    --use_rmsnorm=True \
+    --attn_talking_heads=False \
+    --attn_on_attn=False \
+    --attn_gate_values=True \
+    --sandwich_norm=False \
+    --rel_pos_bias=False \
+    --use_qk_norm_attn=False \
+    --spatial_rel_pos_bias=True \
+    --bucket_values=False \
+    --shift_mem_down=1
