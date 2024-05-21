@@ -80,4 +80,90 @@ python3 run_vqvae.py run \
     --cropping_type='without_padding' \
 ```
 
-The VQVAE training code is DistributedDataParallel (DDP) compatible. For example to train with 4 GPUs run with: mpirun -np 4 --oversubscribe --allow-run-as-root python3 run_vqvae.py run \
+The VQVAE training code is DistributedDataParallel (DDP) compatible. For example to train with 4 GPUs run with:
+```bash
+mpirun -np 4 --oversubscribe --allow-run-as-root python3 run_vqvae.py run
+'''
+
+
+
+### Train Transformer
+```bash
+python3 run_transformer.py run \
+    --training_subjects=${path_to_training_subjects} \
+    --validation_subjects=${path_to_validation_subjects}  \
+    --project_directory=${project_directory_path} \
+    --encoding_conditioning_path=${path_to_conditoinings} \
+    --experiment_name="performer_PET" \
+    --mode='training' \
+    --deterministic=False \
+    --cuda_benchmark=True \
+    --device=0 \
+    --seed=4 \
+    --epochs=25 \
+    --learning_rate=0.001 \
+    --gamma='auto' \
+    --log_every=1 \
+    --checkpoint_every=1\
+    --eval_every=5 \
+    --batch_size=1 \
+    --eval_batch_size=1 \
+    --num_worker=16 \
+    --prefetch_factor=10 \
+    --starting_epoch=0 \
+    --network='performer' \
+    --vocab_size=256 \
+    --n_embed=256 \
+    --n_layers=22 \
+    --n_head=8 \
+    --emb_dropout=0.0 \
+    --ff_dropout=0.0 \
+    --attn_dropout=0.0 \
+    --spatial_position_emb="absolute"
+```
+To train the transformer one can encode images on the fly using the trained VQ-VAE, for this the VQ-VAE checkpoint and network parameters must be included as inputs. Or you can encode the images before and have them in a folder as the "training/validation_subjects path".
+Further work using latent token masking can be used by adding a path for the masking files using the input "token_masking_path". 
+
+For the encoding_conditioning_path and token_masking_path a csv file should be provided with 2 columns: "subject" and "conditioning" where the subject is the subject name and conditioning value is the path to the conditioning for that subject.
+
+### Anomaly Detection
+```bash
+python3 anomaly_detection_conditional.py run \
+    --training_subjects=${path_to_training_subjects} \
+    --validation_subjects=${path_to_validation_subjects}  \
+    --project_directory=${project_directory_path} \
+    --encoding_conditioning_path=${path_to_conditoinings} \
+    --experiment_name="performer_PET" \    
+    --vqvae_network_checkpoint='/results/vqgan_ne256_dim64_PET/baseline_vqvae/checkpoints/checkpoint_epoch=600.pt' \
+    --transformer_network_checkpoint='/results/performer_PET/performer/checkpoints/checkpoint_epoch=200.pt' \
+    --infer_mode='anomaly_detection' \
+    --deterministic=False \
+    --cuda_benchmark=True \
+    --device=0 \
+    --seed=4 \
+    --gamma='auto' \
+    --batch_size=1 \
+    --eval_batch_size=1 \
+    --num_workers=8 \
+    --prefetch_factor=8 \
+    --starting_epoch=0 \
+    --network='performer' \
+    --vocab_size_enc256 \
+    --vocab_size=256 \
+    --n_embd=256 \
+    --n_layers=22 \
+    --n_head=8 \
+    --conditioning_type='cross_attend' \
+    --emb_dropout=0.0 \
+    --ff_dropout=0.0 \
+    --attn_dropout=0.0 \
+    --threshold=0.01 \
+    --num_embeddings='(256,)' \
+    --embedding_dim='(128,)' \
+    --dropout_penultimate=True \
+    --dropout_enc=0.0 \
+    --dropout_dec=0.0"
+```
+
+To run anomaly detection inference you can use the following script above. For this a likelihood threshold needs to be defined for the likelihood on whether to resample tokens.
+You can also use the KDE inference method by changing infer_mode to "kde_zscore" to generate multiple healed representations of the original image.
