@@ -153,13 +153,7 @@ def training(config: dict):
         transformation_order=config["transformation_order"],
     )
 
-    #config["relative_spatial_pos_attr"] = RelativeSpatialPositioning(
-    #    spatial_dims=2,
-    #    dimensions=(1,) + config["spatial_shape"],
-    #    ordering=config["ordering"].get_sequence_ordering(),
-    #    bucket_values=config["bucket_values"],
-    #    bucket_beta=config["spatial_bias_max_dist"],
-    #)
+
     config["relative_spatial_pos_attr"] = None
 
     network = get_transformer_network(config).to(device)

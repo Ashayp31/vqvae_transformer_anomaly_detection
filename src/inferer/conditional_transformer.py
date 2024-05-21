@@ -55,11 +55,6 @@ class TransformerConditionalInferer(Inferer):
 
         resampled_latent, resample_mask = self.resample(network, input_pet, input_ct, conditioning, token_mask, spatial_enc, revert_ordering, index_sequence, latent_shape)
 
-        #resample_mask = self.smooth_resampling_mask(resample_mask)
-
-        #del network
-
-        #self.vqvae_model.load_state_dict(self.vqvae_checkpoint)
         self.vqvae_model.to(self.device)
 
         if isinstance(self.vqvae_model, torch.nn.parallel.DistributedDataParallel):
@@ -92,16 +87,6 @@ class TransformerConditionalInferer(Inferer):
         selected_probs = torch.gather(probs, 2, zs_out.cpu().unsqueeze(2).long())
         selected_probs = selected_probs.squeeze(2)
 
-        #latent_shape = None
-        #if self.use_llmap:
-        #    average_map = np.load(self.llmap)
-        #    average_map = torch.from_numpy(average_map)
-        #    average_map = average_map.unsqueeze(0)
-        #    latent_shape = average_map.shape
-        #    average_map = average_map.reshape(average_map.shape[0], -1)
-        #    average_map = average_map[:, ind_sequencing]
-        #    selected_probs = torch.div(selected_probs, average_map)
-
         mask = (selected_probs.float() < self.threshold).long().squeeze(1)
 
         sampled = zs_in.clone().to(self.device)
@@ -118,16 +103,9 @@ class TransformerConditionalInferer(Inferer):
                     logits = transformer_network(sampled[:, :i + 1], ct_in, conditioning, token_mask, spatial_encoding, reduced_spatial_conditioning=spatial_conditioning_reduced)[:, i, :]
                 probs_ = F.softmax(logits, dim=1)
                 indexes = torch.multinomial(probs_[:, :-1], 1).squeeze(-1)
-                #indexes = torch.argmax(probs_[:,:-1]).unsqueeze(0)
                 sampled[:, i + 1] = mask[:, i] * indexes.cpu() + (1 - mask[:, i]) * sampled[:, i + 1].cpu()
 
-        # if latent_shape is None:
-            # latent_shape = or
-            # need a workaround here,
-            # latent_map = np.load('/nfs/home/apatel/CT_PET_FDG/results/vqgan_suv_15_jp_do_005_wn_none_dropout_end_ne64_PET_6/enc_dec_performer/average_ll_map.npy')
-            # latent_map = torch.from_numpy(latent_map)
-            # latent_map = latent_map.unsqueeze(0)
-            # latent_shape = latent_map.shape
+
         latent_shape = [1, latent_shape[0], latent_shape[1], latent_shape[2]]
         upsampled_mask = copy.deepcopy(mask)
         upsampled_mask = upsampled_mask[:, rev_ordering]
@@ -143,7 +121,7 @@ class TransformerConditionalInferer(Inferer):
             logits = transformer_network(sampled[:, :i + 1], ct_in, conditioning, token_mask, spatial_encoding, reduced_spatial_conditioning=spatial_conditioning_reduced)[:, i, :]
 
         probs_ = F.softmax(logits, dim=1)
-        #indexes = torch.argmax(probs_[:,:-1]).unsqueeze(0).unsqueeze(0)
+
         indexes = torch.multinomial(probs_[:, :-1], 1)
         sampled = torch.cat((sampled.cpu(), indexes.cpu()), dim=1)
 
@@ -470,55 +448,6 @@ class VQVAETransformerKDEZscoreInferer(TransformerConditionalInferer):
         output_resample_mask = copy.deepcopy(resample_mask)
 
 
-        # ###############################################################################################################
-        # 
-        # #at this point reconds and original_pet have the same dimension i.e. [1,1, 208, 168, 216] or [1,num_passes_sampling*num_passes_dropout, 208,168,216]
-        # #bandwidth_calc_type = ["sheather_jones", "scott"]
-        # bandwidth_calc_type = ["scott"]
-        # # kernels = ["gaussian", "tophat", "epanechnikov", "exponential", "linear", "cosine"]
-        # epsilon_bandwidths = [0.01,0.025,0.05,0.1,0.2]
-        # kernels = ["gaussian"]
-        # #epsilon_bandwidths = [0.01]
-        # kde_result = (2*torch.ones(1,len(kernels) * len(epsilon_bandwidths) * len(bandwidth_calc_type), original_pet.shape[2], original_pet.shape[3], original_pet.shape[4])).numpy()
-        # 
-        # output_resample_mask = copy.deepcopy(resample_mask)
-        # resample_mask = self.smooth_resampling_mask(resample_mask)
-        # kde_resample_mask = copy.deepcopy(resample_mask)
-        # kde_resample_mask[kde_resample_mask>0.05] = 1
-        # kde_resample_mask[kde_resample_mask<=0.05] = 0
-        # 
-        # for ke in range(len(kernels)):
-        #     for ep in range(len(epsilon_bandwidths)):
-        #         for bw in range(len(bandwidth_calc_type)):
-        #             print(bw)
-        #             bw_calc_type = bandwidth_calc_type[bw]
-        # 
-        #             for i in range(recons.shape[2]):
-        #                 for j in range(recons.shape[3]):
-        #                     for k in range(recons.shape[4]):
-        #                         if kde_resample_mask[0,0,i,j,k] == 0:
-        #                             continue
-        #                         else:
-        #                             voxel_vals = recons[0,:,i,j,k].numpy()
-        #                             voxel_vals[voxel_vals > 1] = 1
-        #                             voxel_vals[voxel_vals < 0] = 0
-        #                             if bw_calc_type == "scott":
-        #                                 bandwidth = 1.06 * np.std(voxel_vals) * (np.power(self.num_passes_sampling*self.num_passes_dropout, -0.2))
-        #                             else:
-        #                                 bandwidth = improved_sheather_jones(voxel_vals.reshape(-1,1))
-        #                             bandwidth = bandwidth + epsilon_bandwidths[ep]
-        #                             voxel_vals = voxel_vals.reshape(-1,1)
-        # 
-        #                             kde = KernelDensity(kernel=kernels[ke], bandwidth=bandwidth).fit(voxel_vals)
-        # 
-        #                             gt_voxel = np.array([original_pet[0,0,i,j,k]])
-        #                             kde_result[0,(bw*(len(epsilon_bandwidths) * len(kernels)))+((ke*len(epsilon_bandwidths)) + ep),i,j,k] = np.exp(kde.score_samples(gt_voxel.reshape(-1,1)))   # need to get the right setting for this
-        # 
-        # outputs = {"kde_result": kde_result,
-        #            "mean": mean_rec,
-        #             "std": stdev_rec,
-        #             "resampling_mask": output_resample_mask}
-        ###############################################################################################################
 
         outputs = {"reconstructions": recons,
                    "mean": mean_rec,

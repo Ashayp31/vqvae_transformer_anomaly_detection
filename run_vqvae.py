@@ -875,19 +875,6 @@ def run(
     """
     config = locals()
 
-    if config["no_levels"] == 4:
-        config["downsample_parameters"] = (
-            (4, 2, 1, 1),
-            (4, 2, 1, 1),
-            (4, 2, 1, 1),
-            (4, 2, 1, 1),
-        )
-        config["upsample_parameters"] = (
-            (4, 2, 1, 0, 1),
-            (4, 2, 1, 0, 1),
-            (4, 2, 1, 0, 1),
-            (4, 2, 1, 0, 1),
-        )
 
     modes = [m.value for m in VQVAEModes]
 
